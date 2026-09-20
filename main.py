@@ -1,11 +1,30 @@
-import pyshark
-from pyshark.tshark.tshark import get_tshark_interfaces, get_all_tshark_interfaces_names
-
-from termcolor import cprint
-import pyfiglet
-
 import time
 import threading
+import subprocess
+import sys
+
+# this is the worst part of making open source programs
+# you always gotta do stuff automatically because skids dont know anything
+
+def installpkg(pkg):
+    for p in pkg:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", p, "--break-system-packages"])
+
+try:
+    import pyshark
+    from pyshark.tshark.tshark import get_tshark_interfaces, get_all_tshark_interfaces_names
+
+    from termcolor import cprint
+    import pyfiglet
+except ImportError:
+    installpkg(["pyshark", "termcolor", "pyfiglet"])
+
+    import pyshark
+    from pyshark.tshark.tshark import get_tshark_interfaces, get_all_tshark_interfaces_names
+
+    from termcolor import cprint
+    import pyfiglet
+
 
 ip_file = "captured.txt"
 
