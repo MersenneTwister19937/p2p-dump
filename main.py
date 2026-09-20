@@ -7,9 +7,22 @@ import pyfiglet
 import time
 import threading
 
+ip_file = "captured.txt"
+
 inters = get_all_tshark_interfaces_names()
 
 cprint(pyfiglet.figlet_format("P2P DUMPER"), "red")
+
+print("popular platforms this will work with: ")
+
+print("\n")
+
+cprint("- Snapchat", "yellow")
+cprint("- WhatsApp", "green")
+cprint("- Facebook messanger", "blue")
+cprint("- Any other chat platform that use p2p for calling", "red")
+
+print("\n")
 
 time.sleep(1.5)
 
@@ -30,7 +43,7 @@ cprint("starting packet capture...", "green")
 capture = pyshark.LiveCapture(interface=inters[selected_inter], display_filter="stun.type == 0x0101")
 
 def checkifgotpackets(): # yeah im crap at naming stuff what u gonna do about it
-    if (len(capture) == 0):
+    if (len(ips) == 0):
         cprint("No stun packets picked up!", "red")
         cprint("Make sure you are in an environment that would pick them up, like a call", "red")
         cprint("Or check if you're using the right interface.", "red")
@@ -48,6 +61,10 @@ for packet in capture:
         if (ip not in ips):
             print(f"ip found! {ip}")
             ips.append(ip)
+            with open(ip_file, 'r') as file:
+                if (ip not in file.read()):
+                    with open(ip_file, 'a') as file:
+                        file.write(ip + "\n")
 
 
 
