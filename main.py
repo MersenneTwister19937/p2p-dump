@@ -1,6 +1,53 @@
 import pyshark
+from pyshark.tshark.tshark import get_tshark_interfaces, get_all_tshark_interfaces_names
 
-capture = pyshark.LiveCapture(interface='wlp2s0', display_filter="stun.type == 0x0101")
+from termcolor import cprint
+import pyfiglet
+
+import time
+import threading
+
+inters = get_all_tshark_interfaces_names()
+
+cprint(pyfiglet.figlet_format("P2P DUMPER"), "red")
+
+time.sleep(1.5)
+
+cprint("select the interface you wanna use.", "green")
+time.sleep(0.5)
+for number, name in enumerate(get_tshark_interfaces(), 1):
+    print(f"{number}. {name}")
+
+while True:
+    try:
+        global selected_inter
+        selected_inter = int(input())
+        break
+    except ValueError:
+        cprint("input a number.", "red")
+
+cprint("starting packet capture...", "green")
+capture = pyshark.LiveCapture(interface=inters[selected_inter], display_filter="stun.type == 0x0101")
+
+def checkifgotpackets(): # yeah im crap at naming stuff what u gonna do about it
+    if (len(capture) == 0):
+        cprint("No stun packets picked up!", "red")
+        cprint("Make sure you are in an environment that would pick them up, like a call", "red")
+        cprint("Or check if you're using the right interface.", "red")
+        quit()
+
+thread = threading.Timer(5, checkifgotpackets)
+thread.start()
+
+ips = []
 
 for packet in capture:
-    print(packet)
+    if (hasattr(packet.stun, "att_ipv4")):
+        ip = packet.stun.att_ipv4
+
+        if (ip not in ips):
+            print(f"ip found! {ip}")
+            ips.append(ip)
+
+
+
